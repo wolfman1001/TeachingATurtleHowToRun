@@ -1,8 +1,10 @@
 import turtle
+import math
 from random import randint
 
 
 def move_prey(prey, i):
+    """i can be between 0 and 7, each value of i corresponds to a direction to move in """
     x = prey.xcor()
     y = prey.ycor()
     if i == 0:
@@ -29,6 +31,8 @@ def move_prey(prey, i):
 
 
 def handle_prey_movement(prey, pred, move_list):
+    """Takes an array of numbers and picks one based on the position of the predator
+    turtle in relation to the prey turtle"""
     predx = pred.xcor()
     predy = pred.ycor()
     preyx = prey.xcor()
@@ -52,6 +56,7 @@ def handle_prey_movement(prey, pred, move_list):
 
 
 def handle_pred_movement(pred, prey):
+    """Moves the predator turtle towards the prey turtle"""
     speed = 8
     predx = pred.xcor()
     predy = pred.ycor()
@@ -72,6 +77,7 @@ def handle_pred_movement(pred, prey):
 
 
 def initialise(pred, prey):
+    """Sets up the turtles for a test by giving them random coordinates"""
     pred.penup()
     prey.penup()
     pred_start_x = randint(-500, 500)
@@ -83,6 +89,8 @@ def initialise(pred, prey):
 
 
 def get_score(pred, prey, move_list):
+    """Runs random tests a set number of times then works out an average,
+    caps the score at 100 to prevent it running forever"""
     NUM_TESTS = 75
     score = []
 
@@ -98,6 +106,7 @@ def get_score(pred, prey, move_list):
 
 
 def generate_list():
+    """Generate an array of 7 random numbers between 0 and 7"""
     return [randint(0, 7),
             randint(0, 7),
             randint(0, 7),
@@ -109,6 +118,7 @@ def generate_list():
 
 
 def combine_lists(parent1, parent2):
+    """Generates a new array from two parent arrays"""
     child = [0,0,0,0,0,0,0,0]
     for num in range(0,8):
         flip = randint(0, 1)
@@ -121,9 +131,10 @@ def combine_lists(parent1, parent2):
 
 def run(data):
     data = sorted(data, key=lambda k: k['score'], reverse=True)
-    data = data[0:5]
+    halfLen = math.ceil(len(data) / 2)
+    data = data[0:halfLen]
 
-    for i in range(0, 5):
+    for i in range(0, halfLen):
         parent1 = randint(0, 4)
         parent2 = randint(0, 4)
         move_list = combine_lists(data[parent1]["moves"], data[parent2]["moves"])
@@ -132,10 +143,20 @@ def run(data):
             "moves": move_list
         }
         data.append(tmp)
+    mutate(data)
     for d in data:
         print(str(d["moves"]) + " --- " + str(d["score"]))
     print("*************************************")
 
+def mutate(data):
+    """Adds in the chance for random mutation to avoid the pool of arrays becoming
+    stagnant and recombining into the same thing"""
+    for d in data:
+        MutationChance = randint(0,4)
+        if(MutationChance == 2):
+            MutatedNum = randint(0,7)
+            d["moves"][MutatedNum] = randint(0, 7)
+            d["score"] = get_score(pred, prey, move_list)
 
 wn = turtle.Screen()
 pred = turtle.Turtle()
@@ -145,11 +166,13 @@ pred.shape("turtle")
 prey.shape("turtle")
 pred.speed(0)
 prey.speed(0)
+#Comment out the below line if you want to see the turtles move
+#This will increase the time it takes by quite alot
 turtle.tracer(0, 0)
 initialise(pred, prey)
 
 data = []
-for i in range(0, 10):
+for i in range(0, 15):
     move_list = generate_list()
     tmp = {
         "score": get_score(pred, prey, move_list),
