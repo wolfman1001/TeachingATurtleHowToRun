@@ -83,7 +83,7 @@ def initialise(pred, prey):
 
 
 def get_score(pred, prey, move_list):
-    NUM_TESTS = 50
+    NUM_TESTS = 75
     score = []
 
     for test in range(1, NUM_TESTS):
@@ -161,7 +161,11 @@ for d in data:
     print(str(d["moves"]) + " --- " + str(d["score"]))
 print("*************************************")
 
-for i in range(1, 3):
+for i in range(1, 5):
     run(data)
+data = sorted(data, key=lambda k: k['score'], reverse=True)
+max = data[0]
+print("*************************************")
+print(str(max["moves"]) + " --- " + str(max["score"]))
 wn.mainloop()
 
